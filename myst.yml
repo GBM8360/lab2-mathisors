@@ -2,11 +2,11 @@
 version: 1
 project:
   # TODO: make this yours
-  title: 'My MyST Book'
+  title: 'TODO'
   subtitle: An interactive book built with MyST
   # TODO: add yourself. This is the same author schema a real MOOC contribution uses.
   authors:
-    - name: Your Name
+    - name: Mathis Ors
       affiliations:
         - Polytechnique Montréal
   copyright: '2026'

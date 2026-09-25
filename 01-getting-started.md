@@ -21,7 +21,7 @@ title: Getting started
    This time the workflow installs Python and Node, runs every notebook, builds the
    HTML, and publishes it.
 
-4. Open `https://gbm8360.github.io/lab2-<your-username>/`.
+4. Open `https://gbm8360.github.io/lab2-mathisors/`.
 
 5. Edit `index.md` on the GitHub website, commit, and watch it redeploy — no manual
    steps from here on.

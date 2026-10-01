@@ -51,7 +51,7 @@ We can see that the k-space magnitude is unchanged, as predicted. In the reconst
 
 ## Can we fix it?
 
-:::{attention} TODO
+:::{attention} Correcting motion
 Fixing this could be possible, but we would have to have a reference of how big is the movement and what type of movement appear. This could be done by acquiring reference kspace lines such as navigators to retrospectively correct the phase.
 :::
 

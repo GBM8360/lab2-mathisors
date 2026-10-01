@@ -79,6 +79,8 @@ project:
       hidden: true
     - file: notebooks/01-central-mask.ipynb
       hidden: true
+    - file: notebooks/02-downsampling.ipynb
+      hidden: true
 
 site:
   template: book-theme

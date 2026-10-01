@@ -61,7 +61,7 @@ first glance. But no new high-frequency information was added, so the *true* res
 set by the extent of non-zero k-space, is identical to the cropped case
 {cite:p}`Larson2023`. What zero filling does add is the ringing described by
 [](#eqMaskConv): because the mask fourrier transform to a cardinal sinus shape that is convolved with the image creating a visible
-Gibbs artefact in the high frequency patterns.
+Gibbs artefact.
 
 ## Interactive exploration
 
@@ -81,13 +81,11 @@ size and the difference panel between the two.
 
 ## What the interactivity reveals
 
-:::{attention} TODO (your own observations)
-Looking at the zero filling reconstruction one thing that strike me is that the edge of the brain contains much more of low frequency then I previously thought. It is still visible at around 20% of the kspace kept. Another interesting thing is how the Gibbs artefact manifest it self. At around 70-80% the sinc convulution starts being visible though the ondulation are at high frequency and very close together. As I decreased the kspace kept we actually see the ondulation getting bigger and slower meaning that the sinc artefact frequency may also be being slower or since we are cropping higher frequencies the covlution of the sinc generate at lower frequencies. 
+:::{attention} Observations
+Looking at the zero-filling reconstruction, one thing that strikes me is that the edge of the brain contains much more low frequency than I previously thought. It is still visible at around 20% of the k-space kept. Another interesting thing is how the Gibbs artefact manifests itself. At around 70-80% the sinc convolution starts being visible, though the undulations are at high frequency and very close together. As I decreased the k-space kept, we actually see the undulations getting bigger and slower, meaning that the sinc artefact frequency may also be getting slower, or, since we are cropping higher frequencies, the convolution of the sinc is generated on lower frequencies structure.
+Regular cropping is the least interesting of the two demos, because I don't really see why this would be done for a real MRI acquisition. Zero-filling, corrected with an apodisation window, seems the far superior choice to me, since with only 80% kept, severe artefacts appear and the difference is much higher than with zero-filling. The only interesting artefact here is that streaks appear along the edges of the brain, as the reduced resolution spreads lines of signal toward the sides of the image. I suppose these lines come from the reduction of resolution which spread intensity across pixel, but I'm not too sure.
 :::
 
-## Can we fix it?
+## Uses for real MRI sequence
 
-:::{attention} TODO
-Speculate: can the artefact be reduced retrospectively on this dataset? Would that work
-in a real acquisition?
-:::
+In real MRI application cropping the kspace technicly always happens as it is impossible to sample the infinite kspace. In fact in a normal MRI image there should be some level of Gibbs artefact always present. In fact even at 100% of the kspace kept looking carefully we can kinda see some undulations present. This is  mitiguated by the fact that the intensity of high frequecy data point is much lower then lower frequency, which is hard to see when showing log(K-space). Cropping Kspace could also be used to reduce acquistion time, and therefore zero filling + appodisation should be added.

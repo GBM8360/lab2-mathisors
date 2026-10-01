@@ -2,62 +2,54 @@
 title: Downsampling k-space
 ---
 
-## What we do
-
-:::{attention} TODO
-Describe how you downsample k-space by 2 in one direction (which direction, PE or RO; see
-[](#tblAxes)), and which method you use (skipping lines, cropping, zero-filling…).
-:::
+## The demonstration
 
 The k-space sampling interval sets the field of view, and the extent of k-space sets the
-resolution {cite:p}`Bernstein2004`:
+resolution:
 
 $$
 \mathrm{FOV} = \frac{1}{\Delta k}, \qquad \Delta x = \frac{1}{N\,\Delta k}
 $$ (eqFOV)
 
-## Lab 1 recap
+In this demo k-space is downsampled by a factor $R$ along either the phase-encode or the
+frequency-encode direction. Two ways of doing this are compared: removing every $R$-th
+line, or zero filling the outer k-space.
 
-:::{attention} TODO
-One sentence on the static result from Lab 1.
-:::
+### Removing lines
+
+To downsample by skipping, only one line out of every $R$ is kept, which multiplies the
+effective sample spacing by $R$: $\Delta k_\mathrm{eff} = R\, \Delta k$. By [](#eqFOV), the
+FOV shrinks by the same factor $R$. Anatomy that was inside the original FOV but now falls
+outside the new, smaller one wraps back around into the image, which is called aliasing.
+
+### Zero filling
+
+As in [](./01-central-mask.md), the removed k-space can instead be zero filled: the array
+size stays the same, so by [](#eqFOV) the FOV should be unchanged and I think that no aliasing occurs. 
 
 ## Interactive exploration
 
-% TODO: once the notebook cell is tagged `#| label: figDownsample`, uncomment the figure below
-% and list notebooks/02-downsampling.ipynb in myst.yml's toc with `hidden: true`.
-%
-% :::{figure} #figDownsample
-% :label: downsampleFig
-% TODO caption: what the slider controls and what each panel shows.
-% :::
+:::{figure} #figDownsample
+:label: downsampleFig
+Downsampling the phase-encode direction by a factor $R$ (slider). Top row: removing every
+$R$-th PE line. Bottom row: keeping the same lines but zeroing the skipped ones
+in place instead. Each row shows, left to right, the resulting k-space (log magnitude),
+the reconstructed magnitude image, and the difference from the full-k-space reference.
+:::
 
 :::{tip} Try this
-TODO: tell the reader what to drag and what to look for.
+Drag the slider and watch both rows at once. Compare the two difference panels at the
+same $R$: are they the same, or does one look worse than the other?
 :::
 
 ## What the interactivity reveals
 
-:::{attention} TODO (your own observations)
-Refer to the figure and to [](#eqFOV) in your explanation.
+:::{attention} Observations
+Contrary to my initial belief that zero-filling the missing k-space lines would prevent aliasing, it seems that aliasing still occurs. In fact we can see that the FOV stays the same, but a wrapped-around copy of the brain appears anyway.
+We also clearly see that the number of ghosts appearing matches the downsampling factor $R$: removing every $R$-th line produces $R$ overlapping copies of the brain in the image, however it is hard to tell for the "removing" example if this follows the same rule.
+Interestingly, removing the k-space lines (rather than zero-filling them) creates a new artefact on top of the aliasing. Since the remaining lines are packed together, their spacing is no longer $\Delta k$ but $R\,\Delta k$, so the IFFT has no way of knowing that these samples used to sit further apart. This mismatch between the true and assumed sample positions is what gives the "remove" example a different, more irregular-looking image compared to the zero-fill example, even though both show the same $R$-fold aliasing pattern.
+We can also see the zero filling reduce the intensity of the image si it removes spatial frequencies.
 :::
 
 ## Can we fix it?
-
-:::{attention} TODO
-Your compressed-sensing (ISTA) reconstruction from `figure-demo.ipynb` goes here.
-Compare zero-filling with the CS result, and discuss why random undersampling behaves
-differently from regular undersampling.
-:::
-
-% TODO: optional second figure (label e.g. `figCS`) for the CS reconstruction.
-
-## Code
-
-````{admonition} Click to see the code behind the figure
-:class: tip, dropdown
-
-```python
-# TODO: key snippet (undersampling + reconstruction)
-```
-````
+In reality to use downsampling we need to use special reconstructing technique that uses phased coil arrays to remove the aliasing present. Methods such as GRAPPA can effectively do this, which allow for accelerated imaging. 

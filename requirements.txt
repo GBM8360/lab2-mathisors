@@ -22,6 +22,6 @@ netCDF4
 # and silently fails to produce the PNG.
 kaleido>=1.4
 
-# Add whatever your own content needs, e.g.:
-# scipy
-# nibabel
+# Loading the NIfTI dataset and resizing arrays for 01-central-mask.ipynb
+nibabel
+scipy

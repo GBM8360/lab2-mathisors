@@ -2,7 +2,7 @@
 version: 1
 project:
   # TODO: make this yours
-  title: 'TODO'
+  title: 'Re-exploring k-space interactively'
   subtitle: An interactive book built with MyST
   # TODO: add yourself. This is the same author schema a real MOOC contribution uses.
   authors:
@@ -18,7 +18,7 @@ project:
     - education
 
   numbering:
-    headings: true
+    headings: false
 
   # Hover any of these in the rendered text to see the expansion.
   abbreviations:
@@ -40,6 +40,9 @@ project:
 
   exclude:
     - README.md
+    - LAB2-PLAN.md
+    - 98-getting-started.md
+    - 99-interactive-figures.md
 
   # One source, several outputs.
   exports:
@@ -57,14 +60,16 @@ project:
       # EVERY built page -- including notebooks, which reprint their whole source and
       # a duplicate of the figure. Add new chapters here as well as in `toc`.
       articles:
-        - file: index.md
-        - file: 01-getting-started.md
-        - file: 02-interactive-figures.md
+        - file: 00-Introduction.md
+        - file: 01-central-mask.md
+        - file: 02-downsampling.md
+        - file: 03-motion.md
 
   toc:
-    - file: index.md
-    - file: 01-getting-started.md
-    - file: 02-interactive-figures.md
+    - file: 00-Introduction.md
+    - file: 01-central-mask.md
+    - file: 02-downsampling.md
+    - file: 03-motion.md
     # Notebooks must appear in the toc for MyST to build (and execute) them --
     # otherwise `:::{figure} #label` has nothing to embed and silently renders empty.
     # `hidden: true` keeps it built and referenceable without publishing it as a
@@ -72,11 +77,13 @@ project:
     # second copy next to a page of source code.
     - file: notebooks/figure-demo.ipynb
       hidden: true
+    - file: notebooks/01-central-mask.ipynb
+      hidden: true
 
 site:
   template: book-theme
   options:
-    logo_text: My MyST Book
+    logo_text: Re-exploring k-space interactively
   actions:
     - title: Source on GitHub
       url: https://github.com/GBM8360

@@ -1,5 +1,5 @@
 ---
-title: Head rotation during the acquisition
+title: Head motion during the acquisition
 ---
 ## Motivations
 
@@ -24,10 +24,11 @@ S'(\mathbf{k}) = S(\mathbf{k})\, e^{-2\pi i\, \mathbf{k}\cdot\mathbf{d}}
 $$ (eqShift)
 
 The first figure below uses exactly this, but rather than a one-off linear drift, the
-displacement oscillates sinusoidally over the course of the scan, line by line. Real
-patient motion is rarely a single steady drift in one direction: it is much more often
-quasi-periodic, driven by breathing or the heartbeat, so a cyclical translation is a more
-realistic stand-in for that kind of motion than a constant-velocity ramp.
+displacement oscillates sinusoidally along the readout (frequency-encode) direction over
+the course of the scan, line by line. Real patient motion is rarely a single steady drift
+in one direction: it is much more often quasi-periodic, driven by breathing or the
+heartbeat, so a cyclical translation is a more realistic stand-in for that kind of motion
+than a constant-velocity ramp.
 
 Rotation is the more interesting case for this chapter, because it is not just a phase
 term — rotating an object rotates its k-space by the same angle, which means there is no
@@ -46,21 +47,15 @@ original image, everything from `motion_start` onward comes from the image rotat
 20°. The extension explored here is a *continuous* rotation, ramped linearly between
 `motion_start` and `motion_stop` instead of happening on a single line.
 
-## Lab 1 recap
-
-:::{attention} TODO
-One sentence on the static result from Lab 1.
-:::
-
 ## Interactive exploration
 
-:::{figure} #figMotionPE
-:label: motionPEFig
-Cyclical translation along the phase-encode direction (slider = oscillation amplitude,
-in pixels), mimicking quasi-periodic motion such as breathing or the heartbeat. Top row,
-left to right: the displacement profile over acquisition order, the resulting phase
-added to each k-space sample ([](#eqShift)), and the k-space magnitude. Bottom row: the
-reconstructed image with motion, next to the static reference.
+:::{figure} #figMotionReadout
+:label: motionReadoutFig
+Cyclical translation along the readout (frequency-encode) direction (slider = oscillation
+amplitude, in pixels), mimicking quasi-periodic motion such as breathing or the heartbeat.
+Top row, left to right: the displacement profile over acquisition order, the resulting
+phase added to each k-space sample ([](#eqShift)), and the k-space magnitude. Bottom row:
+the reconstructed image with motion, next to the static reference.
 :::
 
 % TODO: once tagged, uncomment and add to myst.yml's toc with `hidden: true`.
@@ -82,7 +77,7 @@ changes, exactly as [](#eqShift) predicts. All the information about the motion 
 instead packed into the phase panel, where it shows up as a ripple that oscillates at the
 same frequency as the displacement and grows taller as the amplitude increases. Then look
 at the reconstructed image: even though no k-space magnitude was altered, the periodic
-phase produces discrete ghost copies of the object, displaced along the PE direction,
+phase produces discrete ghost copies of the object, displaced along the readout direction,
 rather than the simple blurring a one-off drift would cause.
 :::
 
@@ -106,17 +101,16 @@ Refer to the figures and to [](#eqRotation) in your explanation.
 :class: tip, dropdown
 
 ```python
-ky = np.fft.fftshift(np.fft.fftfreq(nx))[:, None]   # cycles/pixel, phase encode (axis 0)
+kx = np.fft.fftshift(np.fft.fftfreq(ny))[None, :]   # cycles/pixel, readout / frequency encode (axis 1)
 t = np.linspace(0, 1, nx)[:, None]                  # when each PE line is acquired (0 -> 1)
+N_CYCLES = 8                                        # motion periods during the whole scan
 
-def pe_cyclic_translation(amplitude, n_cycles=2):
-    """Object oscillates sinusoidally along PE during the scan, mimicking
-    quasi-periodic motion such as breathing or the heartbeat: line i is
-    acquired with the object shifted by amplitude * sin(2*pi*n_cycles*t_i) px.
-    By the Fourier shift theorem this is only a phase ramp -- the magnitude
-    is untouched."""
-    d = amplitude * np.sin(2 * np.pi * n_cycles * t)
-    k_m = kspace * np.exp(-2j * np.pi * ky * d)
+def readout_translation(amount):
+    """Object oscillates along readout during the scan: line i is acquired
+    with the object shifted by amount * sin(2*pi*N_CYCLES*t_i) px. By the Fourier shift
+    theorem this is only a phase ramp -- the magnitude is untouched."""
+    d = amount * np.sin(2 * np.pi * N_CYCLES * t)
+    k_m = kspace * np.exp(-2j * np.pi * kx * d)
     return d[:, 0], k_m
 ```
 ````

@@ -1,6 +1,9 @@
 ---
 title: Masking the centre of k-space
 ---
+## Motivations
+
+In practice, no MRI acquisition can sample an infinite k-space, so every real scan is already a finite version of the underlying signal. Understanding what happens when only the central portion of k-space is kept is essential to interpreting real images, since it explains artefacts (like Gibbs) that show up   scans. This demo also looks at two ways a reduced k-space can be done. Cropping by removing kspace lines versus zero filling, which have very different effects on FOV and resolution despite both discarding the same data. 
 
 ## The demonstration
 Kspace is a 2D frequency spectrum of an image.

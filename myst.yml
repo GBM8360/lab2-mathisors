@@ -81,6 +81,8 @@ project:
       hidden: true
     - file: notebooks/02-downsampling.ipynb
       hidden: true
+    - file: notebooks/03-rotation.ipynb
+      hidden: true
 
 site:
   template: book-theme

@@ -1,24 +1,50 @@
 ---
 title: Head rotation during the acquisition
 ---
+## Motivations
+
+Patient motion during acquisition is one of the most common sources of image degradation in clinical MRI, since even small movements partway through a scan can corrupt the final reconstruction in ways that are not obvious from looking at k-space alone. Real motion is also rarely a single steady drift in one direction: it can be more cyclical, like motion from by breathing. So this demo models translation as an oscillation rather than a one-off ramp to better reflect reality. Studying this simplified, line-by-line motion model is therefore a type of stepping stone to understanding real motion-correction used in clinical scanners.
 
 ## What we do
 
-:::{attention} TODO
-Describe the simulation: Cartesian acquisition, one phase-encode line per TR, the patient
-rotates suddenly by 20° near the centre of k-space and then stays still. Explain how the
-k-space lines acquired after the motion are replaced with lines from the rotated image.
-Then introduce your extension: continuous rotation between `motion_start` and `motion_stop`.
-:::
+The acquisition is assumed to be made line by line, so if the patient moves partway through the scan, the lines acquired
+before the motion still describe the old position while the lines acquired after it
+describe the new one. The motion also is applied line per line instead of being instatanious The whole chapter is built around simulating this splice: take the
+lines up to some `motion_start`, and replace the remaining lines with lines coming from a
+moved version of the image.
 
-Rotating an object rotates its k-space by the same angle, which is why the rotated image
-can be used to generate the post-motion lines:
+The simplest version of "moved" is a pure in-plane translation. By the Fourier shift
+theorem, shifting an image only multiplies its k-space by a linear phase ramp — the
+*magnitude* of k-space is completely untouched:
+
+$$
+\rho'(\mathbf{r}) = \rho(\mathbf{r} - \mathbf{d})
+\quad \Longleftrightarrow \quad
+S'(\mathbf{k}) = S(\mathbf{k})\, e^{-2\pi i\, \mathbf{k}\cdot\mathbf{d}}
+$$ (eqShift)
+
+The first figure below uses exactly this, but rather than a one-off linear drift, the
+displacement oscillates sinusoidally over the course of the scan, line by line. Real
+patient motion is rarely a single steady drift in one direction: it is much more often
+quasi-periodic, driven by breathing or the heartbeat, so a cyclical translation is a more
+realistic stand-in for that kind of motion than a constant-velocity ramp.
+
+Rotation is the more interesting case for this chapter, because it is not just a phase
+term — rotating an object rotates its k-space by the same angle, which means there is no
+shortcut: to get the post-motion lines, the image itself has to be rotated and
+re-sampled on the Cartesian grid:
 
 $$
 \rho'(\mathbf{r}) = \rho(R_\theta^{-1}\mathbf{r})
 \quad \Longleftrightarrow \quad
 S'(\mathbf{k}) = S(R_\theta^{-1}\mathbf{k})
 $$ (eqRotation)
+
+The base case required by the lab is a sudden 20° rotation near the centre of k-space
+(the patient jerks, then holds still): everything before `motion_start` comes from the
+original image, everything from `motion_start` onward comes from the image rotated by
+20°. The extension explored here is a *continuous* rotation, ramped linearly between
+`motion_start` and `motion_stop` instead of happening on a single line.
 
 ## Lab 1 recap
 
@@ -28,14 +54,17 @@ One sentence on the static result from Lab 1.
 
 ## Interactive exploration
 
-% TODO: once the notebook cells are tagged, uncomment the figures below and list
-% notebooks/03-motion.ipynb in myst.yml's toc with `hidden: true`.
+:::{figure} #figMotionPE
+:label: motionPEFig
+Cyclical translation along the phase-encode direction (slider = oscillation amplitude,
+in pixels), mimicking quasi-periodic motion such as breathing or the heartbeat. Top row,
+left to right: the displacement profile over acquisition order, the resulting phase
+added to each k-space sample ([](#eqShift)), and the k-space magnitude. Bottom row: the
+reconstructed image with motion, next to the static reference.
+:::
+
+% TODO: once tagged, uncomment and add to myst.yml's toc with `hidden: true`.
 % Reminder: ipywidgets sliders do not work on the static site, so precompute Plotly frames.
-%
-% :::{figure} #figMotionLine
-% :label: motionLineFig
-% TODO caption: slider = phase-encode line at which the motion happens (20° fixed).
-% :::
 %
 % :::{figure} #figMotionAngle
 % :label: motionAngleFig
@@ -48,7 +77,13 @@ One sentence on the static result from Lab 1.
 % :::
 
 :::{tip} Try this
-TODO: tell the reader what to drag and what to look for.
+Drag the slider from 0 up to its maximum. Watch the k-space magnitude panel: it never
+changes, exactly as [](#eqShift) predicts. All the information about the motion is
+instead packed into the phase panel, where it shows up as a ripple that oscillates at the
+same frequency as the displacement and grows taller as the amplitude increases. Then look
+at the reconstructed image: even though no k-space magnitude was altered, the periodic
+phase produces discrete ghost copies of the object, displaced along the PE direction,
+rather than the simple blurring a one-off drift would cause.
 :::
 
 ## What the interactivity reveals
@@ -71,6 +106,17 @@ Refer to the figures and to [](#eqRotation) in your explanation.
 :class: tip, dropdown
 
 ```python
-# TODO: key snippet (build_kspace)
+ky = np.fft.fftshift(np.fft.fftfreq(nx))[:, None]   # cycles/pixel, phase encode (axis 0)
+t = np.linspace(0, 1, nx)[:, None]                  # when each PE line is acquired (0 -> 1)
+
+def pe_cyclic_translation(amplitude, n_cycles=2):
+    """Object oscillates sinusoidally along PE during the scan, mimicking
+    quasi-periodic motion such as breathing or the heartbeat: line i is
+    acquired with the object shifted by amplitude * sin(2*pi*n_cycles*t_i) px.
+    By the Fourier shift theorem this is only a phase ramp -- the magnitude
+    is untouched."""
+    d = amplitude * np.sin(2 * np.pi * n_cycles * t)
+    k_m = kspace * np.exp(-2j * np.pi * ky * d)
+    return d[:, 0], k_m
 ```
 ````

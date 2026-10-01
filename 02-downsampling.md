@@ -1,6 +1,9 @@
 ---
 title: Downsampling k-space
 ---
+## Motivations
+
+Undersampling k-space is one of the main methods used to accelerate MRI acquisition, since fewer acquired lines means less scan time, which matters directly for patient comfort. However, skipping lines will create artefacts, so it is important to build intuition for how the choice of downsampling factor and strategy (skipping vs. zero filling) trades off. 
 
 ## The demonstration
 
@@ -47,7 +50,7 @@ same $R$: are they the same, or does one look worse than the other?
 :::{attention} Observations
 Contrary to my initial belief that zero-filling the missing k-space lines would prevent aliasing, it seems that aliasing still occurs. In fact we can see that the FOV stays the same, but a wrapped-around copy of the brain appears anyway.
 We also clearly see that the number of ghosts appearing matches the downsampling factor $R$: removing every $R$-th line produces $R$ overlapping copies of the brain in the image, however it is hard to tell for the "removing" example if this follows the same rule.
-Interestingly, removing the k-space lines (rather than zero-filling them) creates a new artefact on top of the aliasing. Since the remaining lines are packed together, their spacing is no longer $\Delta k$ but $R\,\Delta k$, so the IFFT has no way of knowing that these samples used to sit further apart. This mismatch between the true and assumed sample positions is what gives the "remove" example a different, more irregular-looking image compared to the zero-fill example, even though both show the same $R$-fold aliasing pattern.
+Interestingly, removing the k-space lines (rather than zero-filling them) creates a new artefact on top of the aliasing. Since the remaining lines are packed together, their spacing is no longer $\Delta k$ but $R\,\Delta k$, so the IFFT has no way of knowing that these samples used to sit further apart. This difference is what gives the "remove" example a different, more irregular-looking image compared to the zero-fill example, even though both uses the same ratio.
 We can also see the zero filling reduce the intensity of the image si it removes spatial frequencies.
 :::
 

@@ -4,8 +4,8 @@ title: Introduction
  
 
 :::{attention} About this book
-This book is a follow-up to Exercise 3 of Lab 1 of the course GBM8360. It revisits three
-manipulations of raw k-space with interactive figures. Interacting with the figures will help provide additionnal insight that static figure just cannot. The goal of this myst book is to gain additionnal intuition on how kspace work related to MRI and to show cool and interesting stuff!
+This book is a follow-up to Exercise 3 of Lab 1 in the course GBM8360. It revisits three
+manipulations of raw k-space with interactive figures. Interacting with the figures will help provide additionnal insight that static figure just can't. The goal of this myst book is to gain additionnal intuition on how kspace work related to MRI and to show cool and interesting stuff!
 :::
 ## About the author
 
@@ -30,9 +30,9 @@ S(k_x, k_y) = \mathcal{F}\{s(x, y)\}
 $$ (eqFT)
 ## How to read this book
 
-- 01 [](./01-central-mask.md): Exploring Kspace cropping, FOV and resolution.
-- 02 [](./02-downsampling.md): 02 Exploring downsampling and compressed sensing MRI.
-- 03 [](./03-motion.md): 03 Exploring how duration affect kspace.
+- 01 [](./01-central-mask.md): Exploring Kspace cropping and its effect on FOV and resolution.
+- 02 [](./02-downsampling.md): 02 Exploring downsampling.
+- 03 [](./03-motion.md): 03 Exploring how cyclic motion affect kspace.
 
 :::{tip} How to use the interactive figures
 Read the introduction of every interactive plot and play with the sliders to gain intuition on the different Kspace mecanism.

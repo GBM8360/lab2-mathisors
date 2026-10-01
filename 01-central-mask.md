@@ -3,9 +3,9 @@ title: Masking the centre of k-space
 ---
 ## Motivations
 
-In practice, no MRI acquisition can sample an infinite k-space, so every real scan is already a finite version of the underlying signal. Understanding what happens when only the central portion of k-space is kept is essential to interpreting real images, since it explains artefacts (like Gibbs) that show up   scans. This demo also looks at two ways a reduced k-space can be done. Cropping by removing kspace lines versus zero filling, which have very different effects on FOV and resolution despite both discarding the same data. 
+In practice, no MRI acquisition can sample an infinite k-space, so every real scan is a finite version of the underlying signal. Understanding what happens when only a portion of k-space is kept is essential to interpreting real images. This demo also looks at two ways you show a reduced k-space. Cropping by removing kspace lines and cropping using zero filling, which have very effects on FOV and resolution despite both discarding the same amount of data. 
 
-## The demonstration
+## The background
 Kspace is a 2D frequency spectrum of an image.
 Each data point of k-space represent one spatial frequency of the image. Samples near the centre describe slowly varying features, like the overall intensity and contrast between
 tissues, while data points at the edges describe high frequency pattern like edges and fine details {cite:p}`Larson2023`.
@@ -14,12 +14,19 @@ In this demo a square mask is applied to keep a smaller area of the k-space and
 reconstruct the image with an inverse FFT. The rest of the kspace can either be removed or filled with zeroes, this will create two different effects.
 
 $$
-M(k_x, k_y) =
+M_{zeroFill}(k_x, k_y) =
 \begin{cases}
 1 & |k_x| \le a \ \text{and} \ |k_y| \le a \\
 0 & \text{else}
 \end{cases}
 $$ (eqMask)
+$$
+M_{crop}(k_x, k_y) =
+\begin{cases}
+1 & |k_x| \le a \ \text{and} \ |k_y| \le a \\
+nan & \text{else}
+\end{cases}
+$$ (eqMask_nan)
 ### Cropping
 
 To crop k-space, the mask is applied directly and the values outside of it are simply
@@ -71,22 +78,21 @@ Gibbs artefact.
 :::{figure} #figMask
 :label: maskFig
 Masking the centre of k-space with [](#eqMaskConv): the slider sets the fraction of
-k-space kept by the mask, and the buttons switch between zero filling and cropping. Each
+k-space kept by the mask. Each
 row of panels shows, from left to right, the masked k-space (log magnitude), the
 reconstructed magnitude image, and the difference from the full-k-space reference image.
 :::
 
 :::{tip} Try this
-Drag the slider to change the fraction of k-space kept by the mask. Then switch between
-the "Zero filling" and "Cropping" buttons at the same fraction, and compare the image
+Drag the slider to change the fraction of k-space kept by the mask. Compare the images
 size and the difference panel between the two.
 :::
 
 ## What the interactivity reveals
 
 :::{attention} Observations
-Looking at the zero-filling reconstruction, one thing that strikes me is that the edge of the brain contains much more low frequency than I previously thought. It is still visible at around 20% of the k-space kept. Another interesting thing is how the Gibbs artefact manifests itself. At around 70-80% the sinc convolution starts being visible, though the undulations are at high frequency and very close together. As I decreased the k-space kept, we actually see the undulations getting bigger and slower, meaning that the sinc artefact frequency may also be getting slower, or, since we are cropping higher frequencies, the convolution of the sinc is generated on lower frequencies structure.
-Regular cropping is the least interesting of the two demos, because I don't really see why this would be done for a real MRI acquisition. Zero-filling, corrected with an apodisation window, seems the far superior choice to me, since with only 80% kept, severe artefacts appear and the difference is much higher than with zero-filling. The only interesting artefact here is that streaks appear along the edges of the brain, as the reduced resolution spreads lines of signal toward the sides of the image. I suppose these lines come from the reduction of resolution which spread intensity across pixel, but I'm not too sure.
+Looking at the zero-filling reconstruction, one thing that strikes me is that the edge of the brain, which contains a small amount of fat is much more low frequency than I previously thought. It is still visible at around 20% of the k-space kept. Another interesting thing is how the Gibbs artefact manifests itself. At around 70-80% the sinc convolution starts being visible, though the undulations are at high frequency and very close together. As I decreased the k-space kept, we actually see the undulations getting bigger and slower, meaning that the sinc artefact frequency may also be getting slower, or, since we are cropping higher frequencies, the convolution of the sinc is generated on lower frequencies structure.
+Regular cropping is the least interesting of the two demos, because I don't really see why this would be done for a real MRI acquisition. Zero-filling, corrected with an apodisation window, seems the far superior choice to me, since with only 20% removed, severe artefacts appear and the difference is much higher than with zero-filling. The only interesting artefact here is that streaks appear along the edges of the brain, as the reduced resolution spreads signal toward the sides of the image. I suppose these lines come from the reduction of resolution which spread intensity across pixel, but I'm not too sure.
 :::
 
 ## Uses for real MRI sequence

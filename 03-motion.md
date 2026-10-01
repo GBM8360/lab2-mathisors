@@ -31,42 +31,25 @@ phase added to each k-space sample ([](#eqShift)), and the k-space magnitude. Bo
 the reconstructed image with motion, next to the static reference.
 :::
 
-<!--
-TODO: once tagged, uncomment and add to myst.yml's toc with `hidden: true`.
-Reminder: ipywidgets sliders do not work on the static site, so precompute Plotly frames.
-
-:::{figure} #figMotionAngle
-:label: motionAngleFig
-TODO caption: slider = rotation angle, motion at a fixed line near the centre.
-:::
-
-:::{figure} #figMotionSweep
-:label: motionSweepFig
-TODO caption: image error as a function of where the motion window sits in k-space.
-:::
--->
-
 :::{tip} Try this
-Drag the slider from 0 up to its maximum. Watch the k-space magnitude panel: it never
-changes, exactly as [](#eqShift) predicts. All the information about the motion is
+Drag the slider from 0 up to its maximum. Watch the k-space magnitude panel and phase difference pannel. All the information about the motion is
 instead packed into the phase panel, where it shows up as a ripple that oscillates at the
 same frequency as the displacement and grows taller as the amplitude increases. Then look
 at the reconstructed image: even though no k-space magnitude was altered, the periodic
-phase produces discrete ghost copies of the object, displaced along the readout direction,
-rather than the simple blurring a one-off drift would cause.
+phase produces discrete ghost copies of the object, displaced along the phase-encode direction.
 :::
 
 ## What the interactivity reveals
 
-:::{attention} TODO (your own observations)
-Refer to the figures and to [](#eqRotation) in your explanation.
+:::{attention} Observation
+In the phase difference panel we see a phase ramp appearing in a cyclic way with a slope proportional to the displacement at the moment that line was acquired ([](#eqShift)). Since the displacement oscillates, the slope goes up, back through zero, and down again from line to line, giving the repeating pattern of the panel. Interestingly, the center of the phase difference stays close to zero no matter how much oscillation is present. This would mean there almost is no phase difference at center of kspace. My intuition is that the phase difference is related to Kx, since it close to 0 around the center no phase difference appears. Infact we do see the difference augmenting with Kx.
+As we increase the amplitude, the slope grows and the phase starts to wrap in the Kx direction too. This create an interesting pattern with wrapping in the two direction.
+We can see that the k-space magnitude is unchanged, as predicted. In the reconstructed image, however, the magnitude looks ghosted along the phase-encode direction. The motion is along the readout direction, but it is the periodic modulation from one phase encode line to the next that creates the ghosts, so the copies are spaced out along the phase encode axis.
 :::
 
 ## Can we fix it?
 
 :::{attention} TODO
-- Known angle and timing: what happens if you counter-rotate the post-motion lines?
-- Unknown angle: your entropy test (autofocus).
-- Would this work in a real experiment? Why or why not?
+Fixing this could be possible, but we would have to have a reference of how big is the movement and what type of movement appear. This could be done by acquiring reference kspace lines such as naviguators to retrospectively correct the phase.
 :::
 
